@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: ElkAlarm Binding
-Bundle-SymbolicName: org.openhab.binding.elkalarm;singleton:=true
+Bundle-Name: Elk M1 Binding
+Bundle-SymbolicName: org.openhab.binding.elkm1;singleton:=true
 Bundle-Vendor: openHAB
 Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
@@ -15,9 +15,9 @@ Import-Package:
  org.eclipse.smarthome.core.thing.binding.builder,
  org.eclipse.smarthome.core.thing.type,
  org.eclipse.smarthome.core.types,
- org.openhab.binding.elkalarm,
- org.openhab.binding.elkalarm.handler,
+ org.openhab.binding.elkm1,
+ org.openhab.binding.elkm1.handler,
  org.slf4j
 Service-Component: OSGI-INF/*.xml
-Export-Package: org.openhab.binding.elkalarm,
- org.openhab.binding.elkalarm.handler
+Export-Package: org.openhab.binding.elkm1,
+ org.openhab.binding.elkm1.handler

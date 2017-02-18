@@ -5,33 +5,35 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.elkalarm.handler;
+package org.openhab.binding.elkm1.handler;
 
-import static org.openhab.binding.elkalarm.ElkAlarmBindingConstants.CHANNEL_1;
+import static org.openhab.binding.elkm1.ElkAlarmBindingConstants.CHANNEL_1;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.elkalarm.internal.config.ElkAlarmConfig;
-import org.openhab.binding.elkalarm.internal.elk.ElkAlarmConnection;
+import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
+import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
+import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link ElkAlarmHandler} is responsible for handling commands, which are
+ * The {@link ElkM1Handler} is responsible for handling commands, which are
  * sent to one of the channels.
  *
  * @author David Bennett - Initial contribution
  */
-public class ElkAlarmHandler extends BaseBridgeHandler {
+public class ElkM1Handler extends BaseBridgeHandler {
 
-    private Logger logger = LoggerFactory.getLogger(ElkAlarmHandler.class);
+    private Logger logger = LoggerFactory.getLogger(ElkM1Handler.class);
 
     private ElkAlarmConnection connection;
+    private ElkMessageFactory messageFactory;
 
-    public ElkAlarmHandler(Bridge thing) {
+    public ElkM1Handler(Bridge thing) {
         super(thing);
     }
 
@@ -49,6 +51,6 @@ public class ElkAlarmHandler extends BaseBridgeHandler {
 
         // Load up the config and then get the connection to the elk setup.
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
-        connection = new ElkAlarmConnection(config);
+        connection = new ElkAlarmConnection(config, messageFactory);
     }
 }

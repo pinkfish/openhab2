@@ -5,22 +5,22 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.elkalarm;
+package org.openhab.binding.elkm1;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
 /**
- * The {@link ElkAlarmBinding} class defines common constants, which are 
+ * The {@link ElkAlarmBinding} class defines common constants, which are
  * used across the whole binding.
- * 
+ *
  * @author David Bennett - Initial contribution
  */
 public class ElkAlarmBindingConstants {
 
     public static final String BINDING_ID = "elkalarm";
-    
+
     // List of all Thing Type UIDs
-    public final static ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
+    public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "bridge");
 
     // List of all Channel ids
     public final static String CHANNEL_1 = "channel1";
