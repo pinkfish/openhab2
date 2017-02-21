@@ -34,8 +34,10 @@
 		<state>
 			<options>
 				<option value="away">Away</option>
-				<option value="home">Home</option>
-				<option value="homearmed">Home Armed</option>
+				<option value="night">Night</option>
+				<option value="stayHome">Stay Home</option>
+				<option value="vacation">Vacation</option>
+				<option value="disarm">Disarm</option>
 			</options>
 		</state>
 	</channel-type>
