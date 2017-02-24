@@ -12,11 +12,15 @@ import static org.openhab.binding.elkm1.ElkAlarmBindingConstants.CHANNEL_1;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
+import org.openhab.binding.elkm1.internal.elk.ElkListener;
+import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
+import org.openhab.binding.elkm1.internal.elk.message.VersionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Bennett - Initial contribution
  */
-public class ElkM1Handler extends BaseBridgeHandler {
+public class ElkM1Handler extends BaseBridgeHandler implements ElkListener {
 
     private Logger logger = LoggerFactory.getLogger(ElkM1Handler.class);
 
@@ -50,7 +54,20 @@ public class ElkM1Handler extends BaseBridgeHandler {
         updateStatus(ThingStatus.ONLINE);
 
         // Load up the config and then get the connection to the elk setup.
+        messageFactory = new ElkMessageFactory();
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
         connection = new ElkAlarmConnection(config, messageFactory);
+        connection.addElkListener(this);
+        if (connection.initialize()) {
+            connection.sendCommand(new VersionRequest());
+            updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
+        } else {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
+        }
+    }
+
+    @Override
+    public void handleElkMessage(ElkMessage message) {
+        logger.info("Got elk message {}", message.toString());
     }
 }

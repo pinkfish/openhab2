@@ -19,12 +19,12 @@ import org.openhab.binding.elkm1.ElkAlarmBindingConstants;
 import org.openhab.binding.elkm1.handler.ElkM1Handler;
 
 /**
- * The {@link ElkAlarmHandlerFactory} is responsible for creating things and thing
+ * The {@link ElkM1HandlerFactory} is responsible for creating things and thing
  * handlers.
  *
  * @author David Bennett - Initial contribution
  */
-public class ElkAlarmHandlerFactory extends BaseThingHandlerFactory {
+public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
 
     private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
             .singleton(ElkAlarmBindingConstants.THING_TYPE_BRIDGE);

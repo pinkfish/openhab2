@@ -4,10 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import javax.net.SocketFactory;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.slf4j.Logger;
@@ -31,21 +37,64 @@ public class ElkAlarmConnection {
 
     public boolean initialize() {
         try {
-            SocketFactory factory = SSLSocketFactory.getDefault();
+            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            } };
+
+            SSLContext context = SSLContext.getInstance("SSL");
+            context.init(new KeyManager[] {}, trustAllCerts, new java.security.SecureRandom());
+            SSLSocketFactory factory = context.getSocketFactory();
             // Create a socket with the ssl socket factory.
-            socket = factory.createSocket(config.ipAddress, config.port);
+            // socket = (SSLSocket) factory.createSocket(config.ipAddress, config.port);
+            // socket.startHandshake();
+            socket = new Socket(config.ipAddress, 2101);
+            running = true;
+            elkAlarmThread = new Thread(new ReadingDataThread());
+            elkAlarmThread.start();
         } catch (IOException e) {
+            logger.error("Unable to open connection to the elk alarm {}:{}", config.ipAddress, config.port, e);
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Unable to open connection to the elk alarm {}:{}", config.ipAddress, config.port, e);
+            return false;
+        } catch (KeyManagementException e) {
             logger.error("Unable to open connection to the elk alarm {}:{}", config.ipAddress, config.port, e);
             return false;
         }
 
-        return true;
+        return socket != null && !socket.isClosed();
     }
 
-    public void sendCommand(ElkMessage message, List<String> args) {
+    /**
+     * Called to shutdown the running threads and close the socket.
+     */
+    public void shutdown() {
+        running = false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            logger.error("Closing the socket", config.ipAddress, config.port, e);
+        }
+    }
+
+    public void sendCommand(ElkMessage message) {
         String toSend = message.getSendableMessage() + "\r\n";
         try {
-            socket.getOutputStream().write(toSend.getBytes("US_ASCII"));
+            socket.getOutputStream().write(toSend.getBytes(StandardCharsets.US_ASCII));
+            socket.getOutputStream().flush();
+            logger.error("Writing {} to alarm", toSend);
         } catch (IOException e) {
             logger.error("Errpr writing to elk alarm {}:{}", config.ipAddress, config.port, e);
             running = false;
@@ -81,9 +130,10 @@ public class ElkAlarmConnection {
 
         @Override
         public void run() {
+            logger.info("Starting to run the reading thread.");
             BufferedReader buff;
             try {
-                buff = new BufferedReader(new InputStreamReader(socket.getInputStream(), "US_ASCII"));
+                buff = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
             } catch (IOException e1) {
                 logger.error("Unable to setup the reader for the elk alarm {}:{}", config.ipAddress, config.port, e1);
                 running = false;
@@ -92,6 +142,7 @@ public class ElkAlarmConnection {
             while (running) {
                 try {
                     String line = buff.readLine();
+                    logger.error("Received {} from alarm", line);
                     // Got our line. Yay.
                     ElkMessage message = factory.createMessage(line);
                     if (message != null) {

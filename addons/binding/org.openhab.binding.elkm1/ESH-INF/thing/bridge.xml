@@ -29,6 +29,7 @@
 	</bridge-type>
 
 	<channel-type id="alarmState">
+		<item-type>String</item-type>
 		<label>The state of the alarm</label>
 		<category>Alarm</category>
 		<state>
