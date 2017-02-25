@@ -133,6 +133,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
                 if (thing == null) {
                     // Request the area.
                     connection.sendCommand(new StringTextDescription(ElkTypeToRequest.Area, reply.getAreas()[i]));
+                    logger.error("Requesting area {}", reply.getAreas()[i]);
                 }
                 thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
@@ -147,7 +148,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
                 zoneDetails[i].defintion = reply.getDefinition()[i];
                 if (zoneDetails[i].defintion != ElkDefinition.Disabled) {
                     connection.sendCommand(new StringTextDescription(ElkTypeToRequest.Zone, i + 1));
-                    logger.error("Requesting {}", i);
+                    logger.debug("Requesting {}", i);
                 }
                 Thing thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
