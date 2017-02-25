@@ -17,7 +17,7 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
  */
 public class ElkM1BindingConstants {
 
-    public static final String BINDING_ID = "elkalarm";
+    public static final String BINDING_ID = "elkm1";
 
     // List of all Thing Type UIDs
     public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "bridge");
