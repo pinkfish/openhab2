@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2017 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.elkm1.internal.elk;
 
 import java.io.BufferedReader;
@@ -24,6 +31,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+/**
+ * The connection to the elk, handles the socket and other pieces.
+ *
+ * @author David Bennett - Initial Contribution
+ */
 public class ElkAlarmConnection {
     private final Logger logger = LoggerFactory.getLogger(ElkAlarmConnection.class);
     private final ElkAlarmConfig config;
@@ -118,7 +130,7 @@ public class ElkAlarmConnection {
         try {
             socket.getOutputStream().write(sendStr.getBytes(StandardCharsets.US_ASCII));
             socket.getOutputStream().flush();
-            logger.error("Writing {} to alarm", sendStr);
+            logger.info("Writing {} to alarm", sendStr);
             sentSomethiung = true;
             if (message instanceof EthernetModuleTestReply) {
                 sendActualMessage();
@@ -171,7 +183,7 @@ public class ElkAlarmConnection {
             while (running) {
                 try {
                     String line = buff.readLine();
-                    logger.debug("Received {} from alarm", line);
+                    logger.info("Received {} from alarm", line);
                     // Got our line. Yay.
                     ElkMessage message = factory.createMessage(line);
                     if (message != null) {

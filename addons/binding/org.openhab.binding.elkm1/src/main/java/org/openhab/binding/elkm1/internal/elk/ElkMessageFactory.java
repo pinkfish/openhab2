@@ -1,6 +1,14 @@
+/**
+ * Copyright (c) 2014-2017 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.elkm1.internal.elk;
 
 import org.openhab.binding.elkm1.internal.elk.message.AlarmZoneReply;
+import org.openhab.binding.elkm1.internal.elk.message.ArmingStatusReply;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTest;
 import org.openhab.binding.elkm1.internal.elk.message.StringTextDescriptionReply;
 import org.openhab.binding.elkm1.internal.elk.message.VersionReply;
@@ -11,6 +19,12 @@ import org.openhab.binding.elkm1.internal.elk.message.ZoneStatusReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Creates messages based on the incoming data.
+ *
+ * @author David Bennett - Initial COntribution
+ *
+ */
 public class ElkMessageFactory {
     private final Logger logger = LoggerFactory.getLogger(ElkMessageFactory.class);
 
@@ -22,22 +36,24 @@ public class ElkMessageFactory {
         }
         // Figure out the elk message to create.
         switch (input.substring(2, 4)) {
-            case "VN":
-                return new VersionReply(data.data);
-            case "SD":
-                return new StringTextDescriptionReply(data.data);
+            case "AS":
+                return new ArmingStatusReply(data.getData());
             case "AZ":
                 return new AlarmZoneReply(data.data);
-            case "ZC":
-                return new ZoneChangeUpdate(data.data);
-            case "ZS":
-                return new ZoneStatusReply(data.data);
-            case "ZP":
-                return new ZonePartitionReply(data.data);
-            case "ZD":
-                return new ZoneDefitionReply(data.data);
+            case "SD":
+                return new StringTextDescriptionReply(data.data);
+            case "VN":
+                return new VersionReply(data.data);
             case "XK":
                 return new EthernetModuleTest(data.data);
+            case "ZC":
+                return new ZoneChangeUpdate(data.data);
+            case "ZD":
+                return new ZoneDefitionReply(data.data);
+            case "ZP":
+                return new ZonePartitionReply(data.data);
+            case "ZS":
+                return new ZoneStatusReply(data.data);
         }
         return null;
     }

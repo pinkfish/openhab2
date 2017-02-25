@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2017 by the respective copyright holders.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.elkm1.ElkM1BindingConstants;
 import org.openhab.binding.elkm1.internal.ElkM1HandlerListener;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
+import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmedState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkListener;
@@ -28,8 +29,15 @@ import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 import org.openhab.binding.elkm1.internal.elk.ElkTypeToRequest;
 import org.openhab.binding.elkm1.internal.elk.ElkZoneConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkZoneStatus;
+import org.openhab.binding.elkm1.internal.elk.message.ArmAway;
+import org.openhab.binding.elkm1.internal.elk.message.ArmToNight;
+import org.openhab.binding.elkm1.internal.elk.message.ArmToNightInstant;
+import org.openhab.binding.elkm1.internal.elk.message.ArmToStayHome;
+import org.openhab.binding.elkm1.internal.elk.message.ArmToStayInstant;
+import org.openhab.binding.elkm1.internal.elk.message.ArmToVacation;
 import org.openhab.binding.elkm1.internal.elk.message.ArmingStatus;
 import org.openhab.binding.elkm1.internal.elk.message.ArmingStatusReply;
+import org.openhab.binding.elkm1.internal.elk.message.Disarm;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTest;
 import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
 import org.openhab.binding.elkm1.internal.elk.message.StringTextDescription;
@@ -60,11 +68,14 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     private ElkAlarmConnection connection;
     private ElkMessageFactory messageFactory;
     private ZoneDetails[] zoneDetails = new ZoneDetails[208];
-    private String[] areas = new String[8];
+    private boolean[] areas = new boolean[8];
     private List<ElkM1HandlerListener> listeners = Lists.newArrayList();
 
     public ElkM1BridgeHandler(Bridge thing) {
         super(thing);
+        for (int i = 0; i < areas.length; i++) {
+            areas[i] = false;
+        }
     }
 
     @Override
@@ -130,10 +141,11 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             for (int i = 0; i < 208; i++) {
                 zoneDetails[i].area = reply.getAreas()[i];
                 Thing thing = getThingForType(ElkTypeToRequest.Area, reply.getAreas()[i]);
-                if (thing == null) {
+                if (thing == null && !areas[reply.getAreas()[i] - 1]) {
                     // Request the area.
                     connection.sendCommand(new StringTextDescription(ElkTypeToRequest.Area, reply.getAreas()[i]));
-                    logger.error("Requesting area {}", reply.getAreas()[i]);
+                    areas[reply.getAreas()[i] - 1] = true;
+                    logger.debug("Requesting area {}", reply.getAreas()[i]);
                 }
                 thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
@@ -175,7 +187,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             ArmingStatusReply reply = (ArmingStatusReply) message;
             // Do stuff.
             for (int i = 0; i < 8; i++) {
-                Thing thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
+                Thing thing = getThingForType(ElkTypeToRequest.Area, i + 1);
                 if (thing != null) {
                     ElkM1AreaHandler handler = (ElkM1AreaHandler) thing.getHandler();
                     handler.updateArea(reply.getState()[i], reply.getArmed()[i], reply.getArmedUp()[i]);
@@ -244,5 +256,43 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
 
     public void startScan() {
         connection.sendCommand(new ZoneStatus());
+    }
+
+    public void onAreaAdded(ElkM1AreaHandler elkM1AreaHandler) {
+        connection.sendCommand(new ArmingStatus());
+    }
+
+    public void onZoneAdded(ElkM1ZoneHandler elkM1ZoneHandler) {
+        connection.sendCommand(new ZoneDefinition());
+        connection.sendCommand(new ZonePartition());
+        connection.sendCommand(new ZoneStatus());
+    }
+
+    public void updateArmedState(int area, ElkAlarmArmedState armed) {
+        ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
+        String pincode = String.format("%06d", config.pincode);
+        switch (armed) {
+            case ArmedAway:
+                connection.sendCommand(new ArmAway(area, pincode));
+                break;
+            case Disarmed:
+                connection.sendCommand(new Disarm(area, pincode));
+                break;
+            case ArmedStay:
+                connection.sendCommand(new ArmToStayHome(area, pincode));
+                break;
+            case ArmedStayInstant:
+                connection.sendCommand(new ArmToStayInstant(area, pincode));
+                break;
+            case ArmedToNight:
+                connection.sendCommand(new ArmToNight(area, pincode));
+                break;
+            case ArmedToNightInstant:
+                connection.sendCommand(new ArmToNightInstant(area, pincode));
+                break;
+            case ArmedToVacation:
+                connection.sendCommand(new ArmToVacation(area, pincode));
+                break;
+        }
     }
 }

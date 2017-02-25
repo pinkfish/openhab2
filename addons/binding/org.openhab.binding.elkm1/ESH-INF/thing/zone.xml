@@ -23,7 +23,7 @@
 		<item-type>String</item-type>
 		<label>Definition</label>
 		<description>The definition of this zone.</description>
-		<state>
+		<state readOnly="true">
 			<options>
 				<option value="Disabled">Disabled</option>
 				<option value="BurglarEntryExit1">Burglar Entry/Exit 1</option>
@@ -70,7 +70,7 @@
 		<item-type>String</item-type>
 		<label>Definition</label>
         <description>The status of this zone.</description>
-		<state>
+		<state readOnly="true">
 			<options>
 				<option value="Normal">Normal</option>
 				<option value="Violated">Violated</option>
@@ -85,7 +85,7 @@
 		<item-type>String</item-type>
 		<label>Definition</label>
         <description>The config of this zone.</description>
-		<state>
+		<state readOnly="true">
 			<options>
 				<option value="Open">Open</option>
 				<option value="EOL">EOL</option>
@@ -100,7 +100,7 @@
 		<item-type>Number</item-type>
 		<label>Area</label>
 		<description>The area the zone is in</description>
-		<state max="8" min="1" />
+		<state max="8" min="1 readOnly="true"/>
 	</channel-type>
 
 </thing:thing-descriptions>

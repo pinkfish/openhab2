@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2017 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.elkm1.discovery;
 
 import java.util.Map;
@@ -45,13 +52,13 @@ public class ElkM1DiscoveryHandler extends AbstractDiscoveryService implements E
     }
 
     @Override
-    public void onZoneDiscovered(int areaNum, String label) {
-        logger.info("Zone discovered {} {}", areaNum, label);
+    public void onZoneDiscovered(int zoneNum, String label) {
+        logger.info("Zone discovered {} {}", zoneNum, label);
         ThingUID thingUID = new ThingUID(ElkM1BindingConstants.THING_TYPE_ZONE, bridge.getThing().getUID(),
-                Integer.toString(areaNum));
+                Integer.toString(zoneNum));
         Map<String, Object> properties = Maps.newHashMap();
         properties.put(ElkM1BindingConstants.PROPERTY_TYPE_ID, ElkTypeToRequest.Zone.toString());
-        properties.put(ElkM1BindingConstants.PROPERTY_ZONE_NUM, Integer.toString(areaNum));
+        properties.put(ElkM1BindingConstants.PROPERTY_ZONE_NUM, Integer.toString(zoneNum));
         DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withBridge(bridge.getThing().getUID())
                 .withLabel(label).withProperties(properties).build();
         thingDiscovered(result);
@@ -68,7 +75,7 @@ public class ElkM1DiscoveryHandler extends AbstractDiscoveryService implements E
         ThingUID thingUID = new ThingUID(ElkM1BindingConstants.THING_TYPE_AREA, bridge.getThing().getUID(),
                 Integer.toString(areaNum));
         Map<String, Object> properties = Maps.newHashMap();
-        properties.put(ElkM1BindingConstants.PROPERTY_TYPE_ID, ElkTypeToRequest.Zone.toString());
+        properties.put(ElkM1BindingConstants.PROPERTY_TYPE_ID, ElkTypeToRequest.Area.toString());
         properties.put(ElkM1BindingConstants.PROPERTY_ZONE_NUM, Integer.toString(areaNum));
         DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withBridge(bridge.getThing().getUID())
                 .withLabel(label).withProperties(properties).build();

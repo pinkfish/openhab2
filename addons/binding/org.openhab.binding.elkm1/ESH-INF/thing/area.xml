@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
 	<!-- The zone thing type on the elk a zone is basically a entry/exit thingy to trigger -->
-	<thing-type id="zone">
+	<thing-type id="area">
 		<label>Area</label>
 		<description>The elk area, areas have the arms/disarmed status</description>
 		<channels>
@@ -22,7 +22,7 @@
 		<item-type>String</item-type>
 		<label>State</label>
 		<description>The state of the area</description>
-		<state>
+		<state readOnly="true">
 			<options>
 				<option value="NoAlarmActive">NoAlarmActive</option>
 				<option value="EntranceDelayIsActive">EntranceDelayIsActive</option>
@@ -50,8 +50,8 @@
 
 	<channel-type id="areaarmed">
 		<item-type>String</item-type>
-		<label>State</label>
-		<description>The state of the area</description>
+		<label>Armed</label>
+		<description>The armed state of the area</description>
 		<state>
 			<options>
 				<option value="Disarmed">Disarmed</option>
@@ -68,9 +68,9 @@
 
 	<channel-type id="areaarmup">
 		<item-type>String</item-type>
-		<label>State</label>
-		<description>The state of the area</description>
-		<state>
+		<label>Armup</label>
+		<description>The armup state of the area</description>
+		<state readOnly="true">
 			<options>
 				<option value="NotReadyToArm">NotReadyToArm</option>
 				<option value="ReadyToArm">ReadyToArm</option>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2014-2017 by the respective copyright holders.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,12 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.elkm1.ElkM1BindingConstants;
 import org.openhab.binding.elkm1.discovery.ElkM1DiscoveryHandler;
+import org.openhab.binding.elkm1.handler.ElkM1AreaHandler;
 import org.openhab.binding.elkm1.handler.ElkM1BridgeHandler;
 import org.openhab.binding.elkm1.handler.ElkM1ZoneHandler;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -34,8 +37,10 @@ import com.google.common.collect.ImmutableSet;
  * @author David Bennett - Initial contribution
  */
 public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
-    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet
-            .of(ElkM1BindingConstants.THING_TYPE_BRIDGE, ElkM1BindingConstants.THING_TYPE_ZONE);
+    private Logger logger = LoggerFactory.getLogger(ElkM1BridgeHandler.class);
+    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet.of(
+            ElkM1BindingConstants.THING_TYPE_BRIDGE, ElkM1BindingConstants.THING_TYPE_ZONE,
+            ElkM1BindingConstants.THING_TYPE_AREA);
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     @Override
@@ -48,6 +53,7 @@ public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
 
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
+        logger.error("entering handler creator {}", thing.getUID());
         if (thingTypeUID.equals(ElkM1BindingConstants.THING_TYPE_BRIDGE)) {
             ElkM1BridgeHandler bridge = new ElkM1BridgeHandler((Bridge) thing);
             ElkM1DiscoveryHandler discovery = new ElkM1DiscoveryHandler(bridge);
@@ -59,6 +65,11 @@ public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
         if (thingTypeUID.equals(ElkM1BindingConstants.THING_TYPE_ZONE)) {
             return new ElkM1ZoneHandler(thing);
         }
+        if (thingTypeUID.equals(ElkM1BindingConstants.THING_TYPE_AREA)) {
+            logger.error("creating area handler {}", thingTypeUID);
+            return new ElkM1AreaHandler(thing);
+        }
+        logger.error("Not creating area handler {}", thingTypeUID);
 
         return null;
     }

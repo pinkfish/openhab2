@@ -8,10 +8,6 @@
 		<label>Elk Alarm Connection</label>
 		<description>Connection to the elk alarm</description>
 
-		<channels>
-			<channel id="alarmState" typeId="alarmState" />
-		</channels>
-
 		<config-description>
 			<parameter name="ipAddress" type="text">
 				<label>Ip Address</label>
@@ -27,20 +23,4 @@
 			</parameter>
 		</config-description>
 	</bridge-type>
-
-	<channel-type id="alarmState">
-		<item-type>String</item-type>
-		<label>The state of the alarm</label>
-		<category>Alarm</category>
-		<state>
-			<options>
-				<option value="away">Away</option>
-				<option value="night">Night</option>
-				<option value="stayHome">Stay Home</option>
-				<option value="vacation">Vacation</option>
-				<option value="disarm">Disarm</option>
-			</options>
-		</state>
-	</channel-type>
-
 </thing:thing-descriptions>
