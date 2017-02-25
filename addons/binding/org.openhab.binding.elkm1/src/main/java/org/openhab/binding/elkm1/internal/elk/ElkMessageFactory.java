@@ -1,6 +1,13 @@
 package org.openhab.binding.elkm1.internal.elk;
 
+import org.openhab.binding.elkm1.internal.elk.message.AlarmZoneReply;
+import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTest;
+import org.openhab.binding.elkm1.internal.elk.message.StringTextDescriptionReply;
 import org.openhab.binding.elkm1.internal.elk.message.VersionReply;
+import org.openhab.binding.elkm1.internal.elk.message.ZoneChangeUpdate;
+import org.openhab.binding.elkm1.internal.elk.message.ZoneDefitionReply;
+import org.openhab.binding.elkm1.internal.elk.message.ZonePartitionReply;
+import org.openhab.binding.elkm1.internal.elk.message.ZoneStatusReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +17,27 @@ public class ElkMessageFactory {
     public ElkMessage createMessage(String input) {
         ElkData data = new ElkData(input);
         if (!verifyCrc(data)) {
+            logger.error("Checksum invalid {}  {}", data.getChecksum(), data.getCalculatedChecksum());
             return null;
         }
         // Figure out the elk message to create.
         switch (input.substring(2, 4)) {
             case "VN":
-                return new VersionReply(input);
+                return new VersionReply(data.data);
+            case "SD":
+                return new StringTextDescriptionReply(data.data);
+            case "AZ":
+                return new AlarmZoneReply(data.data);
+            case "ZC":
+                return new ZoneChangeUpdate(data.data);
+            case "ZS":
+                return new ZoneStatusReply(data.data);
+            case "ZP":
+                return new ZonePartitionReply(data.data);
+            case "ZD":
+                return new ZoneDefitionReply(data.data);
+            case "XK":
+                return new EthernetModuleTest(data.data);
         }
         return null;
     }
@@ -35,16 +57,18 @@ public class ElkMessageFactory {
 
         ElkData(String input) {
             length = Integer.valueOf(input.substring(0, 2), 16);
-            logger.error("Len: {}, str len: {}", length, input.length());
-            if (length + 2 < input.length()) {
+            logger.debug("Len: {}, str len: {}", length, input.length());
+            if (length > input.length()) {
                 checksum = -1;
                 calculatedChecksum = 0;
                 command = "  ";
                 data = "";
+                logger.error("Length is incorrect {} {}", length, input.length());
             } else {
                 if (!input.substring(length - 2, length).equals("00")) {
                     checksum = -1;
                     calculatedChecksum = 0;
+                    logger.error("Input does not end in 00", input);
                 } else {
                     checksum = Integer.valueOf(input.substring(length, length + 2), 16);
                     calculatedChecksum = calculateChecksum(input, length);
@@ -53,7 +77,7 @@ public class ElkMessageFactory {
                 // Last two bits should just be 00
                 data = input.substring(4, length - 2);
             }
-            logger.error("Len: {}, checksum: {}, command: {}, data: {}", length, checksum, command, data);
+            logger.debug("Len: {}, checksum: {}, command: {}, data: {}", length, checksum, command, data);
         }
 
         public int getLength() {
@@ -82,7 +106,7 @@ public class ElkMessageFactory {
             for (char ch : input.substring(0, len).toCharArray()) {
                 checksum += ch;
             }
-            logger.error("checksum cal: {}", (~checksum + 1) & 0xff);
+            logger.debug("checksum cal: {}", (~checksum + 1) & 0xff);
             return (~checksum + 1) & 0xff;
         }
     }

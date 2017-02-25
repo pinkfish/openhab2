@@ -48,6 +48,18 @@ public class ZoneChangeUpdate extends ElkMessage {
         }
     }
 
+    public ElkZoneConfig getConfig() {
+        return config;
+    }
+
+    public ElkZoneStatus getStatus() {
+        return status;
+    }
+
+    public int getZoneNumber() {
+        return zoneNumber;
+    }
+
     @Override
     protected String getData() {
         // TODO Auto-generated method stub

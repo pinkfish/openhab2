@@ -7,16 +7,25 @@
  */
 package org.openhab.binding.elkm1.internal;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
-import org.openhab.binding.elkm1.ElkAlarmBindingConstants;
-import org.openhab.binding.elkm1.handler.ElkM1Handler;
+import org.openhab.binding.elkm1.ElkM1BindingConstants;
+import org.openhab.binding.elkm1.discovery.ElkM1DiscoveryHandler;
+import org.openhab.binding.elkm1.handler.ElkM1BridgeHandler;
+import org.openhab.binding.elkm1.handler.ElkM1ZoneHandler;
+import org.osgi.framework.ServiceRegistration;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@link ElkM1HandlerFactory} is responsible for creating things and thing
@@ -25,9 +34,9 @@ import org.openhab.binding.elkm1.handler.ElkM1Handler;
  * @author David Bennett - Initial contribution
  */
 public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
-
-    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
-            .singleton(ElkAlarmBindingConstants.THING_TYPE_BRIDGE);
+    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = ImmutableSet
+            .of(ElkM1BindingConstants.THING_TYPE_BRIDGE, ElkM1BindingConstants.THING_TYPE_ZONE);
+    private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -39,10 +48,35 @@ public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
 
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (thingTypeUID.equals(ElkAlarmBindingConstants.THING_TYPE_BRIDGE)) {
-            return new ElkM1Handler((Bridge) thing);
+        if (thingTypeUID.equals(ElkM1BindingConstants.THING_TYPE_BRIDGE)) {
+            ElkM1BridgeHandler bridge = new ElkM1BridgeHandler((Bridge) thing);
+            ElkM1DiscoveryHandler discovery = new ElkM1DiscoveryHandler(bridge);
+            discoveryServiceRegs.put(bridge.getThing().getUID(), bundleContext
+                    .registerService(DiscoveryService.class.getName(), discovery, new Hashtable<String, Object>()));
+            discovery.activate(null);
+            return bridge;
+        }
+        if (thingTypeUID.equals(ElkM1BindingConstants.THING_TYPE_ZONE)) {
+            return new ElkM1ZoneHandler(thing);
         }
 
         return null;
+    }
+
+    @Override
+    protected void removeHandler(ThingHandler thingHandler) {
+        if (thingHandler instanceof ElkM1BridgeHandler) {
+            ServiceRegistration<?> serviceReg = this.discoveryServiceRegs.get(thingHandler.getThing().getUID());
+            if (serviceReg != null) {
+                // remove discovery service, if bridge handler is removed
+                ElkM1DiscoveryHandler service = (ElkM1DiscoveryHandler) bundleContext
+                        .getService(serviceReg.getReference());
+                service.deactivate();
+                serviceReg.unregister();
+                discoveryServiceRegs.remove(thingHandler.getThing().getUID());
+            }
+
+        }
+        super.removeHandler(thingHandler);
     }
 }

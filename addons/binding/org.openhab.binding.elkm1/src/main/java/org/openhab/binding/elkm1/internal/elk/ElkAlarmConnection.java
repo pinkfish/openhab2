@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -16,6 +18,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
+import org.openhab.binding.elkm1.internal.elk.message.EthernetModuleTestReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +30,10 @@ public class ElkAlarmConnection {
     private final ElkMessageFactory factory;
     private Socket socket;
     private boolean running = false;
+    private boolean sentSomethiung = false;
     private Thread elkAlarmThread;
     private List<ElkListener> listeners = Lists.newArrayList();
+    private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
 
     public ElkAlarmConnection(ElkAlarmConfig config, ElkMessageFactory factory) {
         this.config = config;
@@ -90,13 +95,36 @@ public class ElkAlarmConnection {
     }
 
     public void sendCommand(ElkMessage message) {
-        String toSend = message.getSendableMessage() + "\r\n";
+        synchronized (toSend) {
+            this.toSend.add(message);
+        }
+
+        if (!sentSomethiung) {
+            sendActualMessage();
+        }
+    }
+
+    private void sendActualMessage() {
+        String sendStr;
+        ElkMessage message;
+        synchronized (toSend) {
+            if (toSend.isEmpty()) {
+                sentSomethiung = false;
+                return;
+            }
+            message = toSend.remove();
+        }
+        sendStr = message.getSendableMessage() + "\r\n";
         try {
-            socket.getOutputStream().write(toSend.getBytes(StandardCharsets.US_ASCII));
+            socket.getOutputStream().write(sendStr.getBytes(StandardCharsets.US_ASCII));
             socket.getOutputStream().flush();
-            logger.error("Writing {} to alarm", toSend);
+            logger.error("Writing {} to alarm", sendStr);
+            sentSomethiung = true;
+            if (message instanceof EthernetModuleTestReply) {
+                sendActualMessage();
+            }
         } catch (IOException e) {
-            logger.error("Errpr writing to elk alarm {}:{}", config.ipAddress, config.port, e);
+            logger.error("Error writing to elk alarm {}:{}", config.ipAddress, config.port, e);
             running = false;
             try {
                 socket.close();
@@ -106,6 +134,7 @@ public class ElkAlarmConnection {
             }
             socket = null;
         }
+
     }
 
     /**
@@ -142,7 +171,7 @@ public class ElkAlarmConnection {
             while (running) {
                 try {
                     String line = buff.readLine();
-                    logger.error("Received {} from alarm", line);
+                    logger.debug("Received {} from alarm", line);
                     // Got our line. Yay.
                     ElkMessage message = factory.createMessage(line);
                     if (message != null) {
@@ -155,6 +184,8 @@ public class ElkAlarmConnection {
                     } else {
                         logger.info("Unknown elk message {}", line);
                     }
+                    // See if we need to send a message too.
+                    sendActualMessage();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     logger.error("Error reading line from elk alarm {}:{}", config.ipAddress, config.port, e);
