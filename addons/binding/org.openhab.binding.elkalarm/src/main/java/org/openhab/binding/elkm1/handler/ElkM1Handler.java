@@ -11,12 +11,18 @@ import static org.openhab.binding.elkm1.ElkAlarmBindingConstants.CHANNEL_1;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.openhab.binding.elkm1.ElkAlarmBindingConstants;
 import org.openhab.binding.elkm1.internal.config.ElkAlarmConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmConnection;
+import org.openhab.binding.elkm1.internal.elk.ElkListener;
+import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
+import org.openhab.binding.elkm1.internal.elk.message.VersionReply;
+import org.openhab.binding.elkm1.internal.elk.message.ZoneChangeUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Bennett - Initial contribution
  */
-public class ElkM1Handler extends BaseBridgeHandler {
+public class ElkM1Handler extends BaseBridgeHandler implements ElkListener {
 
     private Logger logger = LoggerFactory.getLogger(ElkM1Handler.class);
 
@@ -51,6 +57,31 @@ public class ElkM1Handler extends BaseBridgeHandler {
 
         // Load up the config and then get the connection to the elk setup.
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
-        connection = new ElkAlarmConnection(config, messageFactory);
+        this.connection = new ElkAlarmConnection(config, messageFactory);
+        this.connection.addElkListener(this);
+    }
+
+    @Override
+    public void handleElkMessage(ElkMessage message) {
+        switch (message.getElkCommand()) {
+            case RequestVersionNumberReply:
+                VersionReply reply = (VersionReply) message;
+                // Yay, have a version number.
+                getThing().setProperty(ElkAlarmBindingConstants.PROPERTY_VERSION_NUMBER, reply.getElkVersion());
+                break;
+            case ZoneChangeUpdateReport:
+                ZoneChangeUpdate update = (ZoneChangeUpdate) message;
+                // Find the thing associated with the zone.
+                Thing zone = getThingForZone(update.getZoneNumber());
+                ElkM1ZoneHandler zoneHandler = zone.getHandler();
+
+                break;
+        }
+
+    }
+
+    private Thing getThingForZone(int zoneNumber) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

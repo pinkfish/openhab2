@@ -23,7 +23,7 @@ public class VersionReply extends ElkMessage {
     /**
      * The version number of this elk.
      */
-    String getElkVersion() {
+    public String getElkVersion() {
         return versionMax + "." + versionMiddle + "." + versionLow;
     }
 

@@ -21,8 +21,14 @@ public class ElkAlarmBindingConstants {
 
     // List of all Thing Type UIDs
     public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "bridge");
+    public final static ThingTypeUID THING_TYPE_ZONE = new ThingTypeUID(BINDING_ID, "zone");
+
+    // List of all the properties on the things.
+    public static final String PROPERTY_VERSION_NUMBER = "version";
 
     // List of all Channel ids
-    public final static String CHANNEL_1 = "channel1";
+    public static final String CHANNEL_ZONE_STATUS = "status";
+    public static final String CHANNEL_ZONE_ALARMED = "alarmed";
+    public static final String CHANNEL_ZONE_CONFIG = "config";
 
 }
