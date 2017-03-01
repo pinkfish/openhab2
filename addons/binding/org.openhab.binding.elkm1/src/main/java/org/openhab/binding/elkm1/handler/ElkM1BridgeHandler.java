@@ -86,7 +86,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     @Override
     public void initialize() {
         // Long running initialization should be done asynchronously in background.
-        updateStatus(ThingStatus.ONLINE);
+        updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Opening alarm connection");
 
         // Load up the config and then get the connection to the elk setup.
         messageFactory = new ElkMessageFactory();
@@ -106,12 +106,33 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     }
 
     /**
+     * Called when the configuration is updated. We will reconnect to the elk at this point.
+     */
+    @Override
+    public void handleConfigurationUpdate(Map<String, Object> configurationParameters) {
+        super.handleConfigurationUpdate(configurationParameters);
+        this.connection.removeElkListener(this);
+        this.connection.shutdown();
+        this.connection = new ElkAlarmConnection(getConfigAs(ElkAlarmConfig.class), messageFactory);
+        connection.addElkListener(this);
+        if (connection.initialize()) {
+            connection.sendCommand(new Version());
+            connection.sendCommand(new ZoneDefinition());
+            connection.sendCommand(new ZonePartition());
+            connection.sendCommand(new ZoneStatus());
+            connection.sendCommand(new ArmingStatus());
+            updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_PENDING, "Requesting version from alarm");
+        } else {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Unable to open socket to alarm");
+        }
+    }
+
+    /**
      * Shutdown the bridge.
      */
     @Override
     public void dispose() {
         connection.shutdown();
-        zones = null;
         areas = null;
         connection = null;
         messageFactory = null;
