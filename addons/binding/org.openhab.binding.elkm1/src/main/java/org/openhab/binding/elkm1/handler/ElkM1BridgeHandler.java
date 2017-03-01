@@ -66,8 +66,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     private ElkAlarmConnection connection;
     private ElkMessageFactory messageFactory;
     // private ZoneDetails[] zoneDetails = new ZoneDetails[208];
-    private boolean[] zones = new boolean[208];
-    private boolean[] areas = new boolean[8];
+    private boolean[] areas = new boolean[ElkMessageFactory.MAX_AREAS];
     private List<ElkM1HandlerListener> listeners = Lists.newArrayList();
 
     public ElkM1BridgeHandler(Bridge thing) {
@@ -135,7 +134,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
         if (message instanceof ZoneStatusReply) {
             ZoneStatusReply reply = (ZoneStatusReply) message;
-            for (int i = 0; i < 208; i++) {
+            for (int i = 0; i < ElkMessageFactory.MAX_ZONES; i++) {
                 Thing thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
                     ElkM1ZoneHandler handler = (ElkM1ZoneHandler) thing.getHandler();
@@ -145,7 +144,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
         if (message instanceof ZonePartitionReply) {
             ZonePartitionReply reply = (ZonePartitionReply) message;
-            for (int i = 0; i < 208; i++) {
+            for (int i = 0; i < ElkMessageFactory.MAX_ZONES; i++) {
                 Thing thing = getThingForType(ElkTypeToRequest.Area, reply.getAreas()[i]);
                 if (thing == null && !areas[reply.getAreas()[i] - 1]) {
                     // Request the area.
@@ -162,7 +161,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
         if (message instanceof ZoneDefitionReply) {
             ZoneDefitionReply reply = (ZoneDefitionReply) message;
-            for (int i = 0; i < 208; i++) {
+            for (int i = 0; i < ElkMessageFactory.MAX_ZONES; i++) {
                 if (reply.getDefinition()[i] != ElkDefinition.Disabled) {
                     connection.sendCommand(new StringTextDescription(ElkTypeToRequest.Zone, i + 1));
                     logger.debug("Requesting {}", i);
@@ -188,7 +187,7 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         if (message instanceof ArmingStatusReply) {
             ArmingStatusReply reply = (ArmingStatusReply) message;
             // Do stuff.
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < ElkMessageFactory.MAX_AREAS; i++) {
                 Thing thing = getThingForType(ElkTypeToRequest.Area, i + 1);
                 if (thing != null) {
                     ElkM1AreaHandler handler = (ElkM1AreaHandler) thing.getHandler();

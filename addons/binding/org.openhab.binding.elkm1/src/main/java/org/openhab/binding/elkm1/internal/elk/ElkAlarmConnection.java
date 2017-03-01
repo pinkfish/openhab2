@@ -47,11 +47,23 @@ public class ElkAlarmConnection {
     private List<ElkListener> listeners = Lists.newArrayList();
     private Queue<ElkMessage> toSend = new ArrayBlockingQueue<>(100);
 
+    /**
+     * Create the connection to the alarm.
+     *
+     * @param config The configuration of the elk config
+     * @param factory The message factory to use
+     */
     public ElkAlarmConnection(ElkAlarmConfig config, ElkMessageFactory factory) {
         this.config = config;
         this.factory = factory;
     }
 
+    /**
+     * Initializes the connection by connecting to the elk and verifying we get
+     * basic data back.
+     *
+     * @return true if successfuly initialized.
+     */
     public boolean initialize() {
         try {
             TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -99,6 +111,8 @@ public class ElkAlarmConnection {
      */
     public void shutdown() {
         running = false;
+        elkAlarmThread.interrupt();
+        elkAlarmThread = null;
         try {
             socket.close();
         } catch (IOException e) {
@@ -106,6 +120,11 @@ public class ElkAlarmConnection {
         }
     }
 
+    /**
+     * Sends a specific command to the elk.
+     *
+     * @param message The message to send.
+     */
     public void sendCommand(ElkMessage message) {
         synchronized (toSend) {
             this.toSend.add(message);
@@ -169,6 +188,7 @@ public class ElkAlarmConnection {
 
     class ReadingDataThread implements Runnable {
 
+        /** The reading thread to get data from the elk. */
         @Override
         public void run() {
             logger.info("Starting to run the reading thread.");

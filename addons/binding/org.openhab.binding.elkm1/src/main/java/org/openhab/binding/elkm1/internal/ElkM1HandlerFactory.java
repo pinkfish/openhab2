@@ -48,9 +48,11 @@ public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
         return SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
     }
 
+    /**
+     * Creates the specific handler for this thing.
+     */
     @Override
     protected ThingHandler createHandler(Thing thing) {
-
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         logger.error("entering handler creator {}", thing.getUID());
@@ -74,6 +76,9 @@ public class ElkM1HandlerFactory extends BaseThingHandlerFactory {
         return null;
     }
 
+    /**
+     * Remove the handler for this thing.
+     */
     @Override
     protected void removeHandler(ThingHandler thingHandler) {
         if (thingHandler instanceof ElkM1BridgeHandler) {

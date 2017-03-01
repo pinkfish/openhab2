@@ -13,7 +13,9 @@ package org.openhab.binding.elkm1.internal;
  * @author David Bennett - Initial Contribution
  */
 public interface ElkM1HandlerListener {
+    /** Called when a zone is discovered. */
     public void onZoneDiscovered(int zoneNum, String label);
 
+    /** Called when an area is discovered. */
     public void onAreaDiscovered(int thingNum, String text);
 }
