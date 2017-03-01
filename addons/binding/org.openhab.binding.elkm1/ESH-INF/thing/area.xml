@@ -4,7 +4,11 @@
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
 	<!-- The zone thing type on the elk a zone is basically a entry/exit thingy to trigger -->
-	<thing-type id="area">
+	<thing-type id="area" listed="false">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge" />
+		</supported-bridge-type-refs>
+		
 		<label>Area</label>
 		<description>The elk area, areas have the arms/disarmed status</description>
 		<channels>
