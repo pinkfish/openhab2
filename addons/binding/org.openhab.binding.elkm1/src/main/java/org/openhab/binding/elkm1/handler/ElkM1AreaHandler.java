@@ -42,10 +42,14 @@ public class ElkM1AreaHandler extends BaseThingHandler {
         if (channelUID.getId().equals(ElkM1BindingConstants.CHANNEL_AREA_ARMED)) {
             StringType str = (StringType) command;
             // Changing the armed state.
-            ElkAlarmArmedState armed = ElkAlarmArmedState.valueOf(str.toString());
-            ElkM1BridgeHandler bridgeHandler = (ElkM1BridgeHandler) getBridge().getHandler();
-            int zone = Integer.valueOf(getThing().getProperties().get(ElkM1BindingConstants.PROPERTY_ZONE_NUM));
-            bridgeHandler.updateArmedState(zone, armed);
+            try {
+                ElkAlarmArmedState armed = ElkAlarmArmedState.valueOf(str.toString());
+                ElkM1BridgeHandler bridgeHandler = (ElkM1BridgeHandler) getBridge().getHandler();
+                int zone = Integer.valueOf(getThing().getProperties().get(ElkM1BindingConstants.PROPERTY_ZONE_NUM));
+                bridgeHandler.updateArmedState(zone, armed);
+            } catch (Exception e) {
+                logger.error("Unable to set the alarmed state to {}", str, toString(), e);
+            }
         }
     }
 

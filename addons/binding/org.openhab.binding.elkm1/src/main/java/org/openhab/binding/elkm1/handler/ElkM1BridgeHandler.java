@@ -27,8 +27,6 @@ import org.openhab.binding.elkm1.internal.elk.ElkListener;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
 import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 import org.openhab.binding.elkm1.internal.elk.ElkTypeToRequest;
-import org.openhab.binding.elkm1.internal.elk.ElkZoneConfig;
-import org.openhab.binding.elkm1.internal.elk.ElkZoneStatus;
 import org.openhab.binding.elkm1.internal.elk.message.ArmAway;
 import org.openhab.binding.elkm1.internal.elk.message.ArmToNight;
 import org.openhab.binding.elkm1.internal.elk.message.ArmToNightInstant;
@@ -67,7 +65,8 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
 
     private ElkAlarmConnection connection;
     private ElkMessageFactory messageFactory;
-    private ZoneDetails[] zoneDetails = new ZoneDetails[208];
+    // private ZoneDetails[] zoneDetails = new ZoneDetails[208];
+    private boolean[] zones = new boolean[208];
     private boolean[] areas = new boolean[8];
     private List<ElkM1HandlerListener> listeners = Lists.newArrayList();
 
@@ -82,15 +81,13 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    /**
+     * Initialize the bridge to do stuff.
+     */
     @Override
     public void initialize() {
         // Long running initialization should be done asynchronously in background.
         updateStatus(ThingStatus.ONLINE);
-
-        // Add in something to all the zone details bits.
-        for (int i = 0; i < 208; i++) {
-            zoneDetails[i] = new ZoneDetails();
-        }
 
         // Load up the config and then get the connection to the elk setup.
         messageFactory = new ElkMessageFactory();
@@ -109,13 +106,25 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
     }
 
+    /**
+     * Shutdown the bridge.
+     */
     @Override
     public void dispose() {
         connection.shutdown();
-        zoneDetails = null;
+        zones = null;
+        areas = null;
+        connection = null;
+        messageFactory = null;
+        assert (listeners.isEmpty());
         super.dispose();
     }
 
+    /**
+     * Handlers an incoming message from the elk system.
+     *
+     * @param message The message from the ekl to handle
+     */
     @Override
     public void handleElkMessage(ElkMessage message) {
         logger.info("Got elk message {}", message.toString());
@@ -127,19 +136,16 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         if (message instanceof ZoneStatusReply) {
             ZoneStatusReply reply = (ZoneStatusReply) message;
             for (int i = 0; i < 208; i++) {
-                zoneDetails[i].config = reply.getConfig()[i];
-                zoneDetails[i].status = reply.getStatus()[i];
                 Thing thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
                     ElkM1ZoneHandler handler = (ElkM1ZoneHandler) thing.getHandler();
-                    handler.updateZoneConfig(zoneDetails[i].config, zoneDetails[i].status);
+                    handler.updateZoneConfig(reply.getConfig()[i], reply.getStatus()[i]);
                 }
             }
         }
         if (message instanceof ZonePartitionReply) {
             ZonePartitionReply reply = (ZonePartitionReply) message;
             for (int i = 0; i < 208; i++) {
-                zoneDetails[i].area = reply.getAreas()[i];
                 Thing thing = getThingForType(ElkTypeToRequest.Area, reply.getAreas()[i]);
                 if (thing == null && !areas[reply.getAreas()[i] - 1]) {
                     // Request the area.
@@ -150,34 +156,30 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
                 thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
                     ElkM1ZoneHandler handler = (ElkM1ZoneHandler) thing.getHandler();
-                    handler.updateZoneArea(zoneDetails[i].area);
+                    handler.updateZoneArea(reply.getAreas()[i]);
                 }
             }
         }
         if (message instanceof ZoneDefitionReply) {
             ZoneDefitionReply reply = (ZoneDefitionReply) message;
             for (int i = 0; i < 208; i++) {
-                zoneDetails[i].defintion = reply.getDefinition()[i];
-                if (zoneDetails[i].defintion != ElkDefinition.Disabled) {
+                if (reply.getDefinition()[i] != ElkDefinition.Disabled) {
                     connection.sendCommand(new StringTextDescription(ElkTypeToRequest.Zone, i + 1));
                     logger.debug("Requesting {}", i);
                 }
                 Thing thing = getThingForType(ElkTypeToRequest.Zone, i + 1);
                 if (thing != null) {
                     ElkM1ZoneHandler handler = (ElkM1ZoneHandler) thing.getHandler();
-                    handler.updateZoneDefinition(zoneDetails[i].defintion);
+                    handler.updateZoneDefinition(reply.getDefinition()[i]);
                 }
             }
         }
         if (message instanceof ZoneChangeUpdate) {
             ZoneChangeUpdate reply = (ZoneChangeUpdate) message;
-            ZoneDetails details = zoneDetails[reply.getZoneNumber() - 1];
-            details.status = reply.getStatus();
-            details.config = reply.getConfig();
             Thing thing = getThingForType(ElkTypeToRequest.Zone, reply.getZoneNumber());
             if (thing != null) {
                 ElkM1ZoneHandler handler = (ElkM1ZoneHandler) thing.getHandler();
-                handler.updateZoneConfig(details.config, details.status);
+                handler.updateZoneConfig(reply.getConfig(), reply.getStatus());
             }
         }
         if (message instanceof EthernetModuleTest) {
@@ -198,13 +200,11 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
             StringTextDescriptionReply reply = (StringTextDescriptionReply) message;
             switch (reply.getTypeResponse()) {
                 case Zone:
-                    ZoneDetails details = zoneDetails[reply.getThingNum() - 1];
-                    details.label = reply.getText();
                     // Once we have a description, see if this zone exists.
                     Thing thing = getThingForType(ElkTypeToRequest.Zone, reply.getThingNum());
                     if (thing == null) {
                         for (ElkM1HandlerListener listener : this.listeners) {
-                            listener.onZoneDiscovered(reply.getThingNum(), details.label);
+                            listener.onZoneDiscovered(reply.getThingNum(), reply.getText());
                         }
                     }
                     break;
@@ -222,18 +222,31 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         }
     }
 
+    /**
+     * Adds a listener to this bridge.
+     */
     public void addListener(ElkM1HandlerListener listener) {
         synchronized (listeners) {
             this.listeners.add(listener);
         }
     }
 
+    /**
+     * Removes a listener from this bridge.
+     */
     public void removeListener(ElkM1HandlerListener listener) {
         synchronized (listeners) {
             this.listeners.remove(listener);
         }
     }
 
+    /**
+     * Gets the thing associated with the type/number.
+     *
+     * @param type the type to look for
+     * @param num the number of the type to look for
+     * @return the thing, null if not found
+     */
     Thing getThingForType(ElkTypeToRequest type, int num) {
         for (Thing thing : getThing().getThings()) {
             Map<String, String> properties = thing.getProperties();
@@ -246,28 +259,39 @@ public class ElkM1BridgeHandler extends BaseBridgeHandler implements ElkListener
         return null;
     }
 
-    class ZoneDetails {
-        ElkZoneConfig config;
-        ElkZoneStatus status;
-        ElkDefinition defintion;
-        String label;
-        int area;
-    }
-
+    /**
+     * Starts a scan by asking for the zone status. This is called from the discovery handler.
+     */
     public void startScan() {
         connection.sendCommand(new ZoneStatus());
     }
 
+    /**
+     * Called when an area is added to ask for the defintion and details of it.
+     *
+     * @param elkM1AreaHandler The handler for the area that is added.
+     */
     public void onAreaAdded(ElkM1AreaHandler elkM1AreaHandler) {
         connection.sendCommand(new ArmingStatus());
     }
 
+    /**
+     * Called when a zone is added to ask for the definition and details of it.
+     *
+     * @param elkM1ZoneHandler The zone handle for the zone.
+     */
     public void onZoneAdded(ElkM1ZoneHandler elkM1ZoneHandler) {
         connection.sendCommand(new ZoneDefinition());
         connection.sendCommand(new ZonePartition());
         connection.sendCommand(new ZoneStatus());
     }
 
+    /**
+     * Sends the right command to the elk to change the alarmed state for the m1 gold.
+     *
+     * @param area The area to alarm
+     * @param armed The state to set it to
+     */
     public void updateArmedState(int area, ElkAlarmArmedState armed) {
         ElkAlarmConfig config = getConfigAs(ElkAlarmConfig.class);
         String pincode = String.format("%06d", config.pincode);
