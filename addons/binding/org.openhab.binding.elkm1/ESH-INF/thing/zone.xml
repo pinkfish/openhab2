@@ -5,10 +5,10 @@
 
 	<!-- The zone thing type on the elk a zone is basically a entry/exit thingy to trigger -->
 	<thing-type id="zone" listed="false">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="bridge" />
-        </supported-bridge-type-refs>
-        
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge" />
+		</supported-bridge-type-refs>
+
 		<label>Zone</label>
 		<description>The elk zone</description>
 		<channels>
@@ -73,7 +73,7 @@
 	<channel-type id="status">
 		<item-type>String</item-type>
 		<label>Definition</label>
-        <description>The status of this zone.</description>
+		<description>The status of this zone.</description>
 		<state readOnly="true">
 			<options>
 				<option value="Normal">Normal</option>
@@ -88,7 +88,7 @@
 	<channel-type id="config">
 		<item-type>String</item-type>
 		<label>Definition</label>
-        <description>The config of this zone.</description>
+		<description>The config of this zone.</description>
 		<state readOnly="true">
 			<options>
 				<option value="Open">Open</option>
@@ -104,7 +104,7 @@
 		<item-type>Number</item-type>
 		<label>Area</label>
 		<description>The area the zone is in</description>
-		<state max="8" min="1 readOnly="true"/>
+		<state max="8" min="1 readOnly=" true " />
 	</channel-type>
 
 </thing:thing-descriptions>
