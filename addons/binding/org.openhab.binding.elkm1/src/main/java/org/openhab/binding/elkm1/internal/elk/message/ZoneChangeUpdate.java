@@ -61,38 +61,24 @@ public class ZoneChangeUpdate extends ElkMessage {
         }
     }
 
-<<<<<<< HEAD:addons/binding/org.openhab.binding.elkalarm/src/main/java/org/openhab/binding/elkm1/internal/elk/message/ZoneChangeUpdate.java
     /** The zone number that has changed. */
     public int getZoneNumber() {
         return zoneNumber;
     }
 
     /** The current config of the zone. */
-=======
->>>>>>> 4550a1098bd36838b8eb6f19bc18146b63e0bb0d:addons/binding/org.openhab.binding.elkm1/src/main/java/org/openhab/binding/elkm1/internal/elk/message/ZoneChangeUpdate.java
     public ElkZoneConfig getConfig() {
         return config;
     }
 
-<<<<<<< HEAD:addons/binding/org.openhab.binding.elkalarm/src/main/java/org/openhab/binding/elkm1/internal/elk/message/ZoneChangeUpdate.java
     /** The current status of the zone. */
-=======
->>>>>>> 4550a1098bd36838b8eb6f19bc18146b63e0bb0d:addons/binding/org.openhab.binding.elkm1/src/main/java/org/openhab/binding/elkm1/internal/elk/message/ZoneChangeUpdate.java
     public ElkZoneStatus getStatus() {
         return status;
     }
 
-<<<<<<< HEAD:addons/binding/org.openhab.binding.elkalarm/src/main/java/org/openhab/binding/elkm1/internal/elk/message/ZoneChangeUpdate.java
-=======
-    public int getZoneNumber() {
-        return zoneNumber;
-    }
-
->>>>>>> 4550a1098bd36838b8eb6f19bc18146b63e0bb0d:addons/binding/org.openhab.binding.elkm1/src/main/java/org/openhab/binding/elkm1/internal/elk/message/ZoneChangeUpdate.java
     @Override
     protected String getData() {
         // TODO Auto-generated method stub
         return "";
     }
-
 }

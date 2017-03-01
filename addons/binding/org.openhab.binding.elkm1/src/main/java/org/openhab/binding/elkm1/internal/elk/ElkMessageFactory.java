@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ElkMessageFactory {
     private final Logger logger = LoggerFactory.getLogger(ElkMessageFactory.class);
+    public static final int MAX_ZONES = 208;
+    public static final int MAX_AREAS = 8;
 
     public ElkMessage createMessage(String input) {
         ElkData data = new ElkData(input);

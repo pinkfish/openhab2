@@ -2,6 +2,7 @@ package org.openhab.binding.elkm1.internal.elk.message;
 
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
+import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 
 /**
  * The arm away class, to put the elk into armed away mode.
@@ -16,8 +17,8 @@ public class ArmAway extends ElkMessage {
     public ArmAway(int area, String pincode) {
         super(ElkCommand.ArmAway);
         this.area = area;
-        if (area > 8) {
-            area = 8;
+        if (area > ElkMessageFactory.MAX_AREAS) {
+            area = ElkMessageFactory.MAX_AREAS;
         }
         if (area < 0) {
             area = 0;

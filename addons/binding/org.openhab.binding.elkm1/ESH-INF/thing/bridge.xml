@@ -3,11 +3,7 @@
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
-<<<<<<< HEAD:addons/binding/org.openhab.binding.elkalarm/ESH-INF/thing/bridge.xml
-	<!-- Elk M1 bridge -->
-=======
 	<!-- The bridge to handle talking to the elk -->
->>>>>>> 4550a1098bd36838b8eb6f19bc18146b63e0bb0d:addons/binding/org.openhab.binding.elkm1/ESH-INF/thing/bridge.xml
 	<bridge-type id="bridge">
 		<label>Elk Alarm Connection</label>
 		<description>Connection to the elk alarm</description>

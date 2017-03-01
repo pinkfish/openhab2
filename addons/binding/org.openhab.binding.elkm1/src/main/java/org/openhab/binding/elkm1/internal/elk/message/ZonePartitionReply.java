@@ -9,6 +9,7 @@ package org.openhab.binding.elkm1.internal.elk.message;
 
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
+import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 
 /**
  * Asks the elk for the zone partitions for all the zones. The partition
@@ -22,9 +23,9 @@ public class ZonePartitionReply extends ElkMessage {
 
     public ZonePartitionReply(String data) {
         super(ElkCommand.ZonePartitionReply);
-        areas = new int[208];
+        areas = new int[ElkMessageFactory.MAX_ZONES];
         byte[] dataBytes = data.getBytes();
-        for (int i = 0; i < 208; i++) {
+        for (int i = 0; i < dataBytes.length && i < ElkMessageFactory.MAX_ZONES; i++) {
             areas[i] = dataBytes[i] - 0x30;
         }
     }

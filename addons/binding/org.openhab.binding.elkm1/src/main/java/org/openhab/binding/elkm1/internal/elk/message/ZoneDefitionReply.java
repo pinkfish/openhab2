@@ -10,6 +10,7 @@ package org.openhab.binding.elkm1.internal.elk.message;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkDefinition;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
+import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 
 /**
  * Returns the definitions of all the zones from the elk.
@@ -21,10 +22,10 @@ public class ZoneDefitionReply extends ElkMessage {
 
     public ZoneDefitionReply(String data) {
         super(ElkCommand.ZoneDefinitionReply);
-        if (data.length() >= 208) {
+        if (data.length() >= ElkMessageFactory.MAX_ZONES) {
             byte[] dataBytes = data.getBytes();
-            definition = new ElkDefinition[208];
-            for (int i = 0; i < 208; i++) {
+            definition = new ElkDefinition[ElkMessageFactory.MAX_ZONES];
+            for (int i = 0; i < dataBytes.length && i < ElkMessageFactory.MAX_ZONES; i++) {
                 int val = dataBytes[i] - 0x30;
                 if (val > ElkDefinition.values().length) {
                     definition[i] = ElkDefinition.Disabled;

@@ -9,6 +9,7 @@ package org.openhab.binding.elkm1.internal.elk.message;
 
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
+import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 import org.openhab.binding.elkm1.internal.elk.ElkZoneConfig;
 import org.openhab.binding.elkm1.internal.elk.ElkZoneStatus;
 
@@ -25,7 +26,7 @@ public class ZoneStatusReply extends ElkMessage {
         super(ElkCommand.ZoneStatusReply);
         config = new ElkZoneConfig[input.length()];
         status = new ElkZoneStatus[input.length()];
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = 0; i < input.length() && i < ElkMessageFactory.MAX_ZONES; i++) {
             int val = Integer.valueOf(input.charAt(i));
             switch (val & 0x3) {
                 case 0:

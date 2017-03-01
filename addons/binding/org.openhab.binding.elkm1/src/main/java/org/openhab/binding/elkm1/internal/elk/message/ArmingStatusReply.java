@@ -12,6 +12,7 @@ import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmUpState;
 import org.openhab.binding.elkm1.internal.elk.ElkAlarmArmedState;
 import org.openhab.binding.elkm1.internal.elk.ElkCommand;
 import org.openhab.binding.elkm1.internal.elk.ElkMessage;
+import org.openhab.binding.elkm1.internal.elk.ElkMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +32,10 @@ public class ArmingStatusReply extends ElkMessage {
         super(ElkCommand.ArmingStatusRequestReply);
         byte[] dataBytes = data.getBytes();
         logger.error("Data {} len {}", data, dataBytes.length);
-        armedUp = new ElkAlarmArmUpState[8];
-        state = new ElkAlarmAreaState[8];
-        armed = new ElkAlarmArmedState[8];
-        for (int i = 0; i < 8; i++) {
+        armedUp = new ElkAlarmArmUpState[ElkMessageFactory.MAX_AREAS];
+        state = new ElkAlarmAreaState[ElkMessageFactory.MAX_AREAS];
+        armed = new ElkAlarmArmedState[ElkMessageFactory.MAX_AREAS];
+        for (int i = 0; i < dataBytes.length && i < ElkMessageFactory.MAX_AREAS; i++) {
             int pos = dataBytes[i] - 0x30;
             armed[i] = ElkAlarmArmedState.values()[pos];
             armedUp[i] = ElkAlarmArmUpState.values()[dataBytes[i + 8] - 0x30];
