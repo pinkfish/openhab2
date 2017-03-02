@@ -42,6 +42,12 @@ public class ElkM1ZoneHandler extends BaseThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
     }
 
+    /**
+     * Updates the zone config with the new zone config.
+     *
+     * @param config the config to update
+     * @param status the status to update
+     */
     public void updateZoneConfig(ElkZoneConfig config, ElkZoneStatus status) {
         logger.debug("Update zone config {} {}", config, status);
         Channel chan = getThing().getChannel(ElkM1BindingConstants.CHANNEL_ZONE_CONFIG);
@@ -51,12 +57,21 @@ public class ElkM1ZoneHandler extends BaseThingHandler {
         chan = getThing().getChannel(ElkM1BindingConstants.CHANNEL_ZONE_DEFINITION);
     }
 
+    /**
+     * The definition of the zone to update.
+     *
+     * @param definition the new defintion
+     */
     public void updateZoneDefinition(ElkDefinition definition) {
         logger.debug("Update zone definition {}", definition);
         Channel chan = getThing().getChannel(ElkM1BindingConstants.CHANNEL_ZONE_DEFINITION);
         updateState(chan.getUID(), new StringType(definition.toString()));
     }
 
+    /**
+     *
+     * @param area the new area the zone is inside
+     */
     public void updateZoneArea(int area) {
         logger.debug("Update zone area {}", area);
         Channel chan = getThing().getChannel(ElkM1BindingConstants.CHANNEL_ZONE_AREA);

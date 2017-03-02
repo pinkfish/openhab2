@@ -16,9 +16,11 @@ Import-Package:
  org.eclipse.smarthome.core.thing.binding.builder,
  org.eclipse.smarthome.core.thing.type,
  org.eclipse.smarthome.core.types,
+ org.eclipse.smarthome.model.script.engine.action,
  org.openhab.binding.elkm1,
  org.openhab.binding.elkm1.handler,
  org.osgi.framework;version="1.8.0",
+ org.osgi.service.component;version="1.2.2",
  org.slf4j
 Service-Component: OSGI-INF/*.xml
 Export-Package: org.openhab.binding.elkm1,

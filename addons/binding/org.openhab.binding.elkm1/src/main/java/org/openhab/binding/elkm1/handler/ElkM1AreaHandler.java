@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The elk area handler to handle the area updates.
+ * The elk area handler to handle the area updates. Areas are the pieces which
+ * can be updated and control the current alarm status.
  *
  * @author David Bennett - Initial Contribution
  */
@@ -37,6 +38,9 @@ public class ElkM1AreaHandler extends BaseThingHandler {
         super.initialize();
     }
 
+    /**
+     * Called to change the channel values and cause the elk to update.
+     */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (channelUID.getId().equals(ElkM1BindingConstants.CHANNEL_AREA_ARMED)) {
@@ -53,6 +57,13 @@ public class ElkM1AreaHandler extends BaseThingHandler {
         }
     }
 
+    /**
+     * Called by the bridge to update the details on this area.
+     *
+     * @param state the new state of the area
+     * @param armed the armed state of the area
+     * @param armUp the armup state of the area
+     */
     public void updateArea(ElkAlarmAreaState state, ElkAlarmArmedState armed, ElkAlarmArmUpState armUp) {
         logger.debug("Update area config {} {} {}", state, armed, armUp);
         Channel chan = getThing().getChannel(ElkM1BindingConstants.CHANNEL_AREA_STATE);

@@ -104,7 +104,7 @@
 		<item-type>Number</item-type>
 		<label>Area</label>
 		<description>The area the zone is in</description>
-		<state max="8" min="1 readOnly=" true " />
+		<state max="8" min="1" readOnly="true" />
 	</channel-type>
 
 </thing:thing-descriptions>
