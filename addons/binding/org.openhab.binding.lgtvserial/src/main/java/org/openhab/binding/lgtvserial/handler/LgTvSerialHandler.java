@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -36,7 +36,7 @@ import gnu.io.NRSerialPort;
 public class LgTvSerialHandler extends BaseThingHandler {
 
     private Logger logger = LoggerFactory.getLogger(LgTvSerialHandler.class);
-    private final static int BAUD = 9600;
+    private static final int BAUD = 9600;
     private NRSerialPort serialPort;
     private OutputStreamWriter output;
     private String portName;
@@ -59,7 +59,7 @@ public class LgTvSerialHandler extends BaseThingHandler {
             } else {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Failed to connect to serial port " + portName);
-                logger.debug("Failed to connect to serial port " + portName);
+                logger.debug("Failed to connect to serial port {}", portName);
             }
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, "Serial port name not configured");

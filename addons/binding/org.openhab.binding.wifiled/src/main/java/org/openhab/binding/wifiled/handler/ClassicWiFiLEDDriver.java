@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,12 +8,12 @@
  */
 package org.openhab.binding.wifiled.handler;
 
+import java.io.IOException;
+
 import org.eclipse.smarthome.core.library.types.HSBType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StringType;
-
-import java.io.IOException;
 
 /**
  * The {@link ClassicWiFiLEDDriver} class is responsible for the communication with the WiFi LED controller.
@@ -28,6 +28,7 @@ public class ClassicWiFiLEDDriver extends AbstractWiFiLEDDriver {
         super(host, port, protocol);
     }
 
+    @Override
     public synchronized LEDStateDTO getLEDStateDTO() throws IOException {
         LEDState s = getLEDState();
 
@@ -98,7 +99,7 @@ public class ClassicWiFiLEDDriver extends AbstractWiFiLEDDriver {
 
     @Override
     public void setPower(OnOffType command) throws IOException {
-        logger.debug("Power " + command.name());
+        logger.debug("Power {}", command.name());
 
         sendRaw(getBytesForPower(command == OnOffType.ON));
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OnkyoConnection {
 
-    private static Logger logger = LoggerFactory.getLogger(OnkyoConnection.class);
+    private Logger logger = LoggerFactory.getLogger(OnkyoConnection.class);
 
     /** default eISCP port. **/
     public static final int DEFAULT_EISCP_PORT = 60128;
@@ -377,11 +377,9 @@ public class OnkyoConnection {
         class Task extends TimerTask {
             @Override
             public void run() {
-                if (connected) {
-                    logger.debug("Test connection to {}:{}", ip, port);
-                    sendCommand(new EiscpMessage.MessageBuilder().command(EiscpCommand.POWER_QUERY.getCommand())
-                            .value(EiscpCommand.POWER_QUERY.getValue()).build());
-                }
+                logger.debug("Test connection to {}:{}", ip, port);
+                sendCommand(new EiscpMessage.MessageBuilder().command(EiscpCommand.POWER_QUERY.getCommand())
+                        .value(EiscpCommand.POWER_QUERY.getValue()).build());
             }
         }
     }
