@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -20,7 +20,7 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueExce
  */
 public abstract class RFXComBaseMessage implements RFXComMessage {
 
-    public final static String ID_DELIMITER = ".";
+    public static final String ID_DELIMITER = ".";
 
     public enum PacketType {
         INTERFACE_CONTROL(0),

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2017 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -46,16 +46,16 @@ public interface RFXComMessage {
     byte[] decodeMessage() throws RFXComException;
 
     /**
-     * Procedure for converting RFXCOM value to Openhab state.
+     * Procedure for converting RFXCOM value to openHAB state.
      *
      * @param valueSelector
      *
-     * @return Openhab state.
+     * @return openHAB state.
      */
     State convertToState(RFXComValueSelector valueSelector) throws RFXComException;
 
     /**
-     * Procedure for converting Openhab state to RFXCOM object.
+     * Procedure for converting openHAB state to RFXCOM object.
      *
      */
     void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException;
