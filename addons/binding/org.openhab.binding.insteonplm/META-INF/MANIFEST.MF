@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: InsteonPLM Binding
 Bundle-SymbolicName: org.openhab.binding.insteonplm;singleton:=true
-Private-Package: org.openhab.binding.nest.internal
-Ignore-Package: org.openhab.binding.nest.internal
+Private-Package: org.openhab.binding.insteonplm.internal
+Ignore-Package: org.openhab.binding.insteonplm.internal
 Bundle-Vendor: openHAB
 Bundle-Version: 2.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
