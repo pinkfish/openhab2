@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2017 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.blueiris.internal.data;
 
 import java.util.List;
@@ -5,6 +12,11 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Reply to the login request sent to blue iris.
+ *
+ * @author David Bennett - Initial contribution
+ */
 public class LoginReply {
     @Expose
     private String result;
