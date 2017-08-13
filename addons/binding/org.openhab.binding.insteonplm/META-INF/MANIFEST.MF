@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.openhab.binding.insteonplm;singleton:=true
 Private-Package: org.openhab.binding.insteonplm.internal
 Ignore-Package: org.openhab.binding.insteonplm.internal
 Bundle-Vendor: openHAB
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 2.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-DocURL: http://www.openhab.org
 Bundle-ClassPath: .
