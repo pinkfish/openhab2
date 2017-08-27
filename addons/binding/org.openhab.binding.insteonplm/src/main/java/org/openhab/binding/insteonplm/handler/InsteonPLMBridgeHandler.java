@@ -265,11 +265,12 @@ public class InsteonPLMBridgeHandler extends BaseBridgeHandler implements Messag
                 // Group 1 is the default group everything is in.
                 if (response.getGroup() != 1) {
                     synchronized (groups) {
-                        if (!groups.containsKey(response.getGroup())) {
-                            groups.put(Integer.valueOf(response.getGroup()), Lists.<InsteonAddress> newArrayList());
+                        Integer groupId = Integer.valueOf(response.getGroup());
+                        if (!groups.containsKey(groupId)) {
+                            groups.put(groupId, Lists.<InsteonAddress> newArrayList());
                             logger.error("Found group {}", response.getGroup());
                         }
-                        groups.get(response.getGroup()).add(response.getAddress());
+                        groups.get(groupId).add(response.getAddress());
                     }
                 }
                 details.setQueried(false);
@@ -427,8 +428,10 @@ public class InsteonPLMBridgeHandler extends BaseBridgeHandler implements Messag
                             logger.error("request queue thread unable to write to port..", e);
                         }
                     }
-                    logger.trace("waiting for request queues to fill");
-                    messagesToSend.wait();
+                    logger.error("waiting for request queues to fill");
+                    synchronized (messagesToSend) {
+                        messagesToSend.wait();
+                    }
                 } catch (InterruptedException e) {
                     logger.error("request queue thread got interrupted, breaking..", e);
                     break;

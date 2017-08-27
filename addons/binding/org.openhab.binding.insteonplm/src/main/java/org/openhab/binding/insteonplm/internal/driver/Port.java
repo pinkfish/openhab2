@@ -118,17 +118,19 @@ public class Port {
      * Stops all threads
      */
     public void stop() {
+        logger.error("Calling stop");
         if (!running) {
             logger.debug("port {} not running, no need to stop it", ioStream.toString());
             return;
         }
+        running = false;
         if (readThread != null) {
             readThread.interrupt();
         }
         if (writeThread != null) {
             writeThread.interrupt();
         }
-        logger.error("waiting for read thread to exit for port {}", ioStream.toString());
+        logger.debug("waiting for read thread to exit for port {}", ioStream.toString());
         try {
             if (readThread != null) {
                 readThread.join(1000);
@@ -145,13 +147,17 @@ public class Port {
             logger.debug("got interrupted waiting for write thread to exit.");
         }
         logger.error("all threads for port {} stopped.", ioStream.toString());
-        running = false;
         // Close the streams.
+        ioStream.close();
+        ioStream = null;
         reader = null;
         writer = null;
         synchronized (messageListeners) {
             messageListeners.clear();
         }
+        writeQueue = null;
+        readThread = null;
+        writeThread = null;
     }
 
     /**
@@ -255,7 +261,7 @@ public class Port {
                         logger.trace("signaling receipt of pure nack");
                         getRequestReplyLock().notify();
                     } else {
-                        logger.trace("got unsolicited message");
+                        logger.trace("got unsolicited message {} {}", waitingFor, msg);
                     }
                 }
             }
@@ -318,16 +324,18 @@ public class Port {
                     // if the wait() times out.
                     getRequestReplyLock().wait(3000); // be patient for 30 sec
                     if (reply == ReplyType.WAITING_FOR_ACK) { // timeout expired without getting ACK or NACK
-                        logger.trace("writer timeout expired, asking for retransmit!");
+                        logger.debug("writer timeout expired, asking for retransmit!");
                         reply = ReplyType.GOT_NACK;
                         break;
                     } else {
-                        logger.trace("writer got ack: {}", (reply == ReplyType.GOT_ACK));
+                        logger.debug("writer got ack: {}", (reply == ReplyType.GOT_ACK));
                     }
                 } catch (InterruptedException e) {
+                    logger.error("interrupted exception: {}", e);
                     break; // done for the day...
                 }
             }
+            logger.debug("end writer got ack: {}", (reply == ReplyType.GOT_ACK));
             return (reply == ReplyType.GOT_NACK);
         }
     }
@@ -356,19 +364,20 @@ public class Port {
                         byte[] header = new byte[2];
                         header[0] = 0x02;
                         header[1] = (byte) msg.getMessageType().getCommand();
-                        logger.error("writing ({}): {}", msg.getQuietTime(), msg);
-                        // To debug race conditions during startup (i.e. make the .items
-                        // file definitions be available *before* the modem link records,
-                        // slow down the modem traffic with the following statement:
-                        // Thread.sleep(500);
-                        synchronized (reader.getRequestReplyLock()) {
-                            ioStream.write(header);
-                            ioStream.write(payload);
-                            while (reader.waitForReply(msg, payload)) {
-                                Thread.sleep(WAIT_TIME);
-                                logger.trace("retransmitting msg: {}", msg);
+                        logger.debug("writing ({}): {} {} {}", msg.getQuietTime(), msg, header, payload);
+
+                        if (ioStream == null) {
+                            logger.debug("ioStream is null: {}", msg);
+                        } else {
+                            synchronized (reader.getRequestReplyLock()) {
                                 ioStream.write(header);
                                 ioStream.write(payload);
+                                while (reader.waitForReply(msg, payload)) {
+                                    Thread.sleep(WAIT_TIME);
+                                    logger.debug("retransmitting msg (frog): {}", msg);
+                                    ioStream.write(header);
+                                    ioStream.write(payload);
+                                }
                             }
                         }
                         // if rate limited, need to sleep now.

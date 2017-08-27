@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.insteonplm.internal.device;
 
-/*
+/**
  * This class has utilities related to the X10 protocol.
  *
  * @author Bernd Pfrommer

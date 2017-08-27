@@ -21,6 +21,8 @@ import com.google.common.collect.Maps;
 
 /**
  * Interfaces with the discovery system to discover exciting new insteon devices.
+ *
+ * @author David Bennett - Initial Contribution.
  */
 public class InsteonDiscoveryHandler extends AbstractDiscoveryService {
     private Logger logger = LoggerFactory.getLogger(InsteonPLMBridgeHandler.class);

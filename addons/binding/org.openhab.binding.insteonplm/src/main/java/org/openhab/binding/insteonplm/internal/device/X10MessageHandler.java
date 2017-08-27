@@ -7,6 +7,12 @@ import org.openhab.binding.insteonplm.internal.message.modem.X10MessageReceived;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Message handler for x10 messages.
+ *
+ * @author Bernd Pfrommer
+ * @since 1.5.0
+ */
 public abstract class X10MessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 

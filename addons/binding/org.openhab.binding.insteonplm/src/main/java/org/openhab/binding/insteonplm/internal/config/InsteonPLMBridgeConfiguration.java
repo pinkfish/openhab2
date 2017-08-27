@@ -1,5 +1,11 @@
 package org.openhab.binding.insteonplm.internal.config;
 
+/**
+ * The configuration class for the plm bridge details.
+ *
+ * @author David Bennett - Initial Contribution
+ *
+ */
 public class InsteonPLMBridgeConfiguration {
     /** The serial port to communicate over. */
     private String serialPort;

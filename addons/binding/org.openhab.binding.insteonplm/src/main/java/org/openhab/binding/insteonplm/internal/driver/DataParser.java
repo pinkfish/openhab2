@@ -147,6 +147,8 @@ public class DataParser {
                     reply = ReplyType.GOT_NACK;
                 }
             }
+            logger.trace("notifying other thread {} {} {}", reply, mess.getMessageType(),
+                    this.sendMessage == null ? "empty" : this.sendMessage.getMessageType());
             this.pendingMessages.notify();
         }
     }
@@ -170,7 +172,7 @@ public class DataParser {
                 // to hang in the wait() below, because unsolicited messages
                 // do not trigger a notify(). For this reason we request retransmission
                 // if the wait() times out.
-                pendingMessages.wait(3000); // be patient for 30 sec
+                pendingMessages.wait(30000); // be patient for 30 sec
                 if (reply == ReplyType.WAITING_FOR_ACK) { // timeout expired without getting ACK or NACK
                     logger.trace("writer timeout expired, asking for retransmit!");
                     reply = ReplyType.GOT_NACK;

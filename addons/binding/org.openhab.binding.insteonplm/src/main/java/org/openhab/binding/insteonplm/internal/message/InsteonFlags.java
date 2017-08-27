@@ -1,5 +1,11 @@
 package org.openhab.binding.insteonplm.internal.message;
 
+/**
+ * Defines the flags for the inteon messages.
+ *
+ * @author Daniel Pfrommer
+ * @since 1.5.0
+ */
 public class InsteonFlags {
     /*
      * From the official Insteon docs: the message flags are as follows:

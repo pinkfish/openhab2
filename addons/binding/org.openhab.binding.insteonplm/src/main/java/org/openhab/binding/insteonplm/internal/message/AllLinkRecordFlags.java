@@ -1,5 +1,11 @@
 package org.openhab.binding.insteonplm.internal.message;
 
+/**
+ * Defines the flags for the all link records.
+ *
+ * @author Daniel Pfrommer
+ * @since 1.5.0
+ */
 public class AllLinkRecordFlags {
     private final boolean inUse;
     private final boolean isController;

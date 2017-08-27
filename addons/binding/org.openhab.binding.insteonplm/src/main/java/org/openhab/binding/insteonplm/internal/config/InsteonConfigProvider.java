@@ -28,6 +28,8 @@ import com.google.common.collect.Lists;
 
 /**
  * Handlers the configuration of the insteon system.
+ *
+ * @author David Bennett - Initial Contribution.
  */
 public class InsteonConfigProvider implements ConfigDescriptionProvider, ConfigOptionProvider {
     private static Logger logger = LoggerFactory.getLogger(InsteonConfigProvider.class);

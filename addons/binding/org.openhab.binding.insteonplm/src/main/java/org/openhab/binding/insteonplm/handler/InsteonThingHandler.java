@@ -37,6 +37,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+/**
+ * The details of the node tracking if we have pinged it for details yet or not.
+ *
+ * @author David Bennett - Initial Contribution
+ */
 public class InsteonThingHandler extends InsteonPlmBaseThing {
     private static Logger logger = LoggerFactory.getLogger(InsteonThingHandler.class);
 

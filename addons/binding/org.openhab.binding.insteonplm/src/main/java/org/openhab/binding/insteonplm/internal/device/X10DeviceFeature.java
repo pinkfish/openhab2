@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+/**
+ * DeviceFeature base class for x10 handling.
+ *
+ * @author Bernd Pfrommer
+ * @since 1.5.0
+ */
 public class X10DeviceFeature {
     private static final Logger logger = LoggerFactory.getLogger(X10DeviceFeature.class);
 
