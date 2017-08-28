@@ -19,4 +19,10 @@ public class PureNack extends BaseModemMessage {
     public byte[] getPayload() {
         return new byte[0];
     }
+
+    @Override
+    public String toString() {
+        return "PureNack [toString()=" + super.toString() + "]";
+    }
+
 }

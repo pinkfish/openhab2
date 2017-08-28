@@ -61,4 +61,10 @@ public abstract class BaseModemMessage {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "BaseModemMessage [messageType=" + messageType + ", quietTime=" + quietTime + ", ackNackByte="
+                + ackNackByte + "]";
+    }
 }

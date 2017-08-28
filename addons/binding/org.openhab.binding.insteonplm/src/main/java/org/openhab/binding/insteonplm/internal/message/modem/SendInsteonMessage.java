@@ -1,5 +1,7 @@
 package org.openhab.binding.insteonplm.internal.message.modem;
 
+import java.util.Arrays;
+
 import org.openhab.binding.insteonplm.internal.device.InsteonAddress;
 import org.openhab.binding.insteonplm.internal.message.InsteonFlags;
 import org.openhab.binding.insteonplm.internal.message.ModemMessageType;
@@ -181,4 +183,11 @@ public class SendInsteonMessage extends BaseModemMessage {
     public long getDirectAckTimeout() {
         return 10000;
     }
+
+    @Override
+    public String toString() {
+        return "SendInsteonMessage [toAddress=" + toAddress + ", cmd1=" + cmd1 + ", flags=" + flags + ", cmd2=" + cmd2
+                + ", data=" + Arrays.toString(data) + ", toString()=" + super.toString() + "]";
+    }
+
 }

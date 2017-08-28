@@ -24,4 +24,9 @@ public class GetNextAllLinkingRecord extends BaseModemMessage {
         return new byte[0];
     }
 
+    @Override
+    public String toString() {
+        return "GetNextAllLinkingRecord [toString()=" + super.toString() + "]";
+    }
+
 }

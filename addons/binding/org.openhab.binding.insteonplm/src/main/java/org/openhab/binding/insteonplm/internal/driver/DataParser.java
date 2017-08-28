@@ -147,7 +147,7 @@ public class DataParser {
                     reply = ReplyType.GOT_NACK;
                 }
             }
-            logger.trace("notifying other thread {} {} {}", reply, mess.getMessageType(),
+            logger.trace("notifying other thread biggles {} {} {}", reply, mess.getMessageType(),
                     this.sendMessage == null ? "empty" : this.sendMessage.getMessageType());
             this.pendingMessages.notify();
         }

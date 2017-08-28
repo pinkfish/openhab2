@@ -48,4 +48,11 @@ public class X10MessageReceived extends BaseModemMessage {
     public byte[] getPayload() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "X10MessageReceived [houseCode=" + houseCode + ", keyCode=" + keyCode + ", cmd=" + cmd + ", isCommand="
+                + isCommand + ", toString()=" + super.toString() + "]";
+    }
+
 }

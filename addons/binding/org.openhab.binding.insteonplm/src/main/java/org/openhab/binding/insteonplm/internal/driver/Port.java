@@ -261,7 +261,7 @@ public class Port {
                         logger.trace("signaling receipt of pure nack");
                         getRequestReplyLock().notify();
                     } else {
-                        logger.trace("got unsolicited message {} {}", waitingFor, msg);
+                        logger.trace("got unsolicited message rabbit {} {}", waitingFor, msg);
                     }
                 }
             }

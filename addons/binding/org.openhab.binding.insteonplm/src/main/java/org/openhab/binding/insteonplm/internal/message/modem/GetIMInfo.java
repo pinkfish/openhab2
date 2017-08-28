@@ -50,4 +50,10 @@ public class GetIMInfo extends BaseModemMessage {
         return new byte[0];
     }
 
+    @Override
+    public String toString() {
+        return "GetIMInfo [modemAddress=" + modemAddress + ", category=" + category + ", subcategory=" + subcategory
+                + ", firmwareRevision=" + firmwareRevision + ", toString()=" + super.toString() + "]";
+    }
+
 }

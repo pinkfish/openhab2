@@ -1,5 +1,7 @@
 package org.openhab.binding.insteonplm.internal.message.modem;
 
+import java.util.Arrays;
+
 import org.openhab.binding.insteonplm.internal.device.InsteonAddress;
 import org.openhab.binding.insteonplm.internal.message.AllLinkRecordFlags;
 import org.openhab.binding.insteonplm.internal.message.ModemMessageType;
@@ -46,4 +48,11 @@ public class AllLinkRecordResponse extends BaseModemMessage {
     public byte[] getPayload() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "AllLinkRecordResponse [address=" + address + ", flags=" + flags + ", group=" + group + ", linkData="
+                + Arrays.toString(linkData) + ", toString()=" + super.toString() + "]";
+    }
+
 }

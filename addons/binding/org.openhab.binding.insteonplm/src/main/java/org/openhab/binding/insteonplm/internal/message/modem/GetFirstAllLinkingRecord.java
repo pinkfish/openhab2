@@ -23,4 +23,10 @@ public class GetFirstAllLinkingRecord extends BaseModemMessage {
     public byte[] getPayload() {
         return new byte[0];
     }
+
+    @Override
+    public String toString() {
+        return "GetFirstAllLinkingRecord [toString()=" + super.toString() + "]";
+    }
+
 }

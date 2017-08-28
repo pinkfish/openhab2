@@ -74,4 +74,11 @@ public class SendX10Message extends BaseModemMessage {
         }
         return data;
     }
+
+    @Override
+    public String toString() {
+        return "SendX10Message [address=" + address + ", cmd=" + cmd + ", isCommand=" + isCommand + ", toString()="
+                + super.toString() + "]";
+    }
+
 }
